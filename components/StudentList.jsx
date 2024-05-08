@@ -1,10 +1,9 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const StudentList = () => {
   const [students, setStudents] = useState([]);
+  const [newStudent, setNewStudent] = useState({ nom: '', email: '', classNom: '' });
 
   useEffect(() => {
     fetchStudents();
@@ -16,6 +15,25 @@ const StudentList = () => {
       setStudents(response.data);
     } catch (error) {
       console.error('Error fetching students:', error);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewStudent({ ...newStudent, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:8099/api/students', newStudent);
+      alert('Student added successfully.');
+      // Fetch students again to update the list
+      fetchStudents();
+      // Clear the form
+      setNewStudent({ nom: '', email: '', classNom: '' });
+    } catch (error) {
+      console.error('Error adding student:', error);
     }
   };
 
@@ -48,6 +66,15 @@ const StudentList = () => {
           )}
         </tbody>
       </table>
+
+      {/* Add Student Form */}
+      <form onSubmit={handleSubmit}>
+        <h2>Add Student</h2>
+        <input type="text" name="nom" placeholder="Name" value={newStudent.nom} onChange={handleChange} required />
+        <input type="email" name="email" placeholder="Email" value={newStudent.email} onChange={handleChange} required />
+        <input type="text" name="classNom" placeholder="Class" value={newStudent.classNom} onChange={handleChange} required />
+        <button type="submit">Add Student</button>
+      </form>
     </div>
   );
 };
