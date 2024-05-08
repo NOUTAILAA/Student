@@ -1,13 +1,30 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const AddTeacherForm = ({ onAddTeacher, classes }) => {
+// eslint-disable-next-line react/prop-types
+const AddTeacherForm = ({ onAddTeacher }) => {
   const [teacherData, setTeacherData] = useState({
     nom: '',
     email: '',
     cin: '',
-    mdp: ''
+    mdp: '',
+    classeId: '',
   });
+
+  const [classes, setClasses] = useState([]);
+
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
+  const fetchClasses = async () => {
+    try {
+      const response = await axios.get('http://localhost:8099/api/classes');
+      setClasses(response.data);
+    } catch (error) {
+      console.error('Error fetching classes:', error);
+    }
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -17,17 +34,29 @@ const AddTeacherForm = ({ onAddTeacher, classes }) => {
     });
   };
 
+  const handleClassChange = (event) => {
+    const classId = event.target.value;
+    const selectedClass = classes.find((classe) => classe.id === classId);
+    setTeacherData({
+      ...teacherData,
+      classeId: classId,
+      classeNom: selectedClass ? selectedClass.nom : 'N/A' // Mise à jour du nom de la classe associée
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
       const response = await axios.post('http://localhost:8099/api/teachers', teacherData);
       onAddTeacher(response.data);
-      // Réinitialisez les champs après l'ajout réussi
+      // Réinitialisation des champs après l'ajout réussi
       setTeacherData({
         nom: '',
         email: '',
         cin: '',
-        mdp: ''
+        mdp: '',
+        classeId: '', // Réinitialisation de l'ID de la classe associée
+        classeNom: 'N/A' // Réinitialisation du nom de la classe associée
       });
     } catch (error) {
       console.error('Error adding teacher:', error);
@@ -86,8 +115,35 @@ const AddTeacherForm = ({ onAddTeacher, classes }) => {
             required
           />
         </div>
-        
-        {/* Ajoutez d'autres champs du formulaire si nécessaire */}
+        {/* Ajout du champ pour la classe associée */}
+        <div className="mb-3">
+          <label htmlFor="classeId" className="form-label">Associated Class</label>
+          <select
+            className="form-control"
+            id="classeId"
+            name="classeId"
+            value={teacherData.classeId}
+            onChange={handleClassChange}
+            required
+          >
+            <option value="">Select a Class</option>
+            {classes.map((classe) => (
+              <option key={classe.id} value={classe.id}>{classe.nom}</option>
+            ))}
+          </select>
+        </div>
+        {/* Affichage du nom de la classe associée */}
+        <div className="mb-3">
+          <label htmlFor="classeNom" className="form-label">Associated Class Name</label>
+          <input
+            type="text"
+            className="form-control"
+            id="classeNom"
+            name="classeNom"
+            value={teacherData.classeNom}
+            readOnly // Pour éviter que l'utilisateur modifie le nom de la classe
+          />
+        </div>
         <button type="submit" className="btn btn-primary">Submit</button>
       </form>
     </div>
