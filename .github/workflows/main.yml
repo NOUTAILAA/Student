@@ -30,12 +30,4 @@ jobs:
       run: npm run build
       working-directory: my-react-app
       
-    - name: Deploy to GitHub Pages
-      if: github.event_name == 'push'
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./my-react-app/build
-        force_orphan: true
-        user_name: 'github-actions[bot]'
-        user_email: 'github-actions[bot]@users.noreply.github.com'
+ 
