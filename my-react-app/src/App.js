@@ -9,15 +9,15 @@ import AddDemande from './components/AddDemande';
 import UserDemandes from './components/UserDemandes'; // Import the new component
 import AllDemandes from './components/AllDemandes';
 import Profile from './components/Profile';
-import home from './components/home';
+ 
 const App = () => {
   return (
     <Router>
       <div>
         
         <Routes> {/* Envelopper vos routes dans un composant Routes */}
-        <Route path="/" exact element={<home/>} />
-          <Route path="/login" exact element={<Login />} />
+       
+          <Route path="/" exact element={<Login />} />
           <Route path="/students" element={<StudentsList />} />
           <Route path="/classes" element={<ClassesList />} />
           <Route path="/groupes" element={<GroupesList />} />
